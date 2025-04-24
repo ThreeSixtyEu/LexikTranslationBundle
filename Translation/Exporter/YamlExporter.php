@@ -131,6 +131,6 @@ class YamlExporter implements ExporterInterface
      */
     public function support($format)
     {
-        return ('yml' == $format);
+        return ('yml' == $format || 'yaml' == $format);
     }
 }

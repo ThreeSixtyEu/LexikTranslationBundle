@@ -244,8 +244,7 @@ class ImportTranslationsCommand extends Command
      */
     protected function importBundleTranslationFiles(BundleInterface $bundle, $locales, $domains, $global = false)
     {
-        $path = $bundle->getPath();
-        if ($global) {            
+        if ($global) {
             $kernel = $this->getApplication()->getKernel();
             if (Kernel::MAJOR_VERSION >= 4) {
                 $path = $kernel->getProjectDir() . '/app';
@@ -254,13 +253,26 @@ class ImportTranslationsCommand extends Command
             }
 
             $path .= '/Resources/' . $bundle->getName() . '/translations';
-            
+
             $this->output->writeln('<info>*** Importing ' . $bundle->getName() . '`s translation files from ' . $path . ' ***</info>');
+
+            $this->output->writeln(sprintf('<info># %s:</info>', $bundle->getName()));
+            $finder = $this->findTranslationsFiles($path, $locales, $domains);
+            $this->importTranslationFiles($finder);
+
+            return;
         }
 
-        $this->output->writeln(sprintf('<info># %s:</info>', $bundle->getName()));
-        $finder = $this->findTranslationsFiles($path, $locales, $domains);
-        $this->importTranslationFiles($finder);
+        $paths = [
+            $bundle->getPath() . '/translations',
+            $bundle->getPath() . '/Resources/translations',
+        ];
+
+        foreach($paths as $path) {
+            $this->output->writeln(sprintf('<info># %s:</info>', $bundle->getName()));
+            $finder = $this->findTranslationsFiles($path, $locales, $domains, false);
+            $this->importTranslationFiles($finder);
+        }
     }
 
     /**
